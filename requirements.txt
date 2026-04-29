@@ -1,1 +1,7 @@
-
+Flask==2.3.0
+flask-cors==4.0.0
+pillow==10.0.0
+numpy==1.24.0
+psd-tools==1.9.28
+requests==2.31.0
+gunicorn==21.2.0
