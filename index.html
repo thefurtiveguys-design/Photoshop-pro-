@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PosterForge – Éditeur d'affiches en ligne</title>
-    <!-- Icônes Font Awesome (pro, sans emoji) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Fabric.js pour le canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <title>PosterForge – Éditeur d'affiches professionnel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js">
+    </script>
     <style>
         :root {
-            --bg-dark: #1e1e1e;
-            --bg-panel: #252526;
-            --bg-input: #333333;
-            --text-primary: #cccccc;
-            --text-secondary: #999999;
+            --bg: #1e1e1e;
+            --panel: #252526;
+            --input: #333;
+            --text: #ccc;
+            --text2: #999;
             --border: #3c3c3c;
             --accent: #0078d4;
-            --accent-hover: #1a8ad4;
-            --danger: #d32f2f;
-            --sidebar-width: 260px;
-            --toolbar-width: 48px;
-            --header-height: 40px;
+            --header: #2d2d30;
+            --toolbar-w: 48px;
+            --sidebar-w: 280px;
         }
 
         * {
@@ -29,11 +25,10 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            background: var(--bg);
+            color: var(--text);
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -41,84 +36,82 @@
             user-select: none;
         }
 
-        /* ========== HEADER ========== */
+        /* HEADER */
         .header {
-            height: var(--header-height);
-            background: #2d2d30;
+            height: 38px;
+            background: var(--header);
             display: flex;
             align-items: center;
             padding: 0 12px;
             border-bottom: 1px solid var(--border);
-            gap: 20px;
-            z-index: 100;
+            gap: 18px;
+            z-index: 20;
         }
-
         .logo {
             font-weight: 700;
-            font-size: 16px;
-            letter-spacing: 0.5px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
             color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .logo i {
-            margin-right: 6px;
-            color: var(--accent);
-        }
-
         .header-actions {
             display: flex;
             gap: 6px;
             margin-left: auto;
         }
-
         .btn {
-            background: var(--bg-input);
-            color: var(--text-primary);
+            background: var(--input);
+            color: var(--text);
             border: 1px solid var(--border);
-            padding: 5px 14px;
+            padding: 5px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: background 0.15s;
+            gap: 5px;
+            transition: background .15s;
+            white-space: nowrap;
         }
         .btn:hover {
             background: #3e3e42;
         }
-        .btn i {
-            font-size: 14px;
+        .btn svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
         }
 
-        /* ========== MAIN LAYOUT ========== */
-        .main-container {
+        /* MAIN */
+        .main {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* ========== TOOLBAR (gauche) ========== */
+        /* TOOLBAR */
         .toolbar {
-            width: var(--toolbar-width);
-            background: #2d2d30;
+            width: var(--toolbar-w);
+            background: var(--header);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 0;
-            gap: 4px;
+            padding: 6px 0;
+            gap: 1px;
         }
-
         .tool-btn {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ccc;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: .15s;
             position: relative;
         }
         .tool-btn:hover {
@@ -126,68 +119,62 @@
         }
         .tool-btn.active {
             background: var(--accent);
-            color: white;
+            color: #fff;
         }
-        .tool-btn i {
-            font-size: 18px;
+        .tool-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
-
-        .tool-separator {
+        .tool-sep {
             width: 28px;
             height: 1px;
             background: var(--border);
-            margin: 4px 0;
+            margin: 3px 0;
         }
 
-        /* ========== CANVAS AREA (centre) ========== */
+        /* CANVAS */
         .canvas-area {
             flex: 1;
             background: #1a1a1a;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+        canvas {
+            display: block;
         }
 
-        .canvas-container {
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-
-        /* ========== SIDEBAR (droite) ========== */
+        /* SIDEBAR */
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-panel);
+            width: var(--sidebar-w);
+            background: var(--panel);
             border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            font-size: 12px;
         }
-
         .panel {
             padding: 10px;
             border-bottom: 1px solid var(--border);
         }
-
         .panel-title {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
+            color: var(--text2);
+            margin-bottom: 7px;
             font-weight: 600;
         }
-
-        /* Layers */
         .layer-item {
             display: flex;
             align-items: center;
             padding: 5px 6px;
-            border-radius: 4px;
-            margin-bottom: 2px;
+            border-radius: 3px;
+            margin-bottom: 1px;
             cursor: pointer;
-            gap: 8px;
-            font-size: 12px;
+            gap: 6px;
+            font-size: 11px;
         }
         .layer-item:hover {
             background: #2a2a2e;
@@ -195,54 +182,57 @@
         .layer-item.selected {
             background: var(--accent);
         }
-        .layer-item i {
-            font-size: 14px;
-            width: 16px;
-            text-align: center;
-            color: #aaa;
+        .layer-item svg {
+            width: 14px;
+            height: 14px;
+            fill: #aaa;
+            flex-shrink: 0;
         }
-        .layer-item .layer-name {
+        .layer-name {
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .layer-item .layer-visibility {
+        .layer-vis {
             cursor: pointer;
-            color: #aaa;
-            font-size: 14px;
+            flex-shrink: 0;
         }
-        .layer-item .layer-visibility.hidden {
-            color: #555;
+        .layer-vis.hidden svg {
+            fill: #444;
         }
-        .layer-actions {
-            display: flex;
-            gap: 4px;
-        }
-        .layer-actions i {
+        .layer-del {
             cursor: pointer;
-            font-size: 13px;
-            padding: 2px;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity .15s;
         }
-
-        /* Properties */
+        .layer-item:hover .layer-del {
+            opacity: 1;
+        }
+        .layer-del svg {
+            fill: #d32f2f;
+            width: 13px;
+            height: 13px;
+        }
         .prop-row {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            gap: 8px;
-            font-size: 12px;
+            margin-bottom: 7px;
+            gap: 7px;
         }
         .prop-row label {
-            width: 55px;
-            color: var(--text-secondary);
+            width: 50px;
+            color: var(--text2);
+            font-size: 11px;
         }
         .prop-row input[type="color"] {
             width: 32px;
             height: 24px;
             border: 1px solid var(--border);
-            background: var(--bg-input);
+            background: var(--input);
             cursor: pointer;
+            padding: 0;
         }
         .prop-row input[type="range"] {
             flex: 1;
@@ -250,19 +240,22 @@
         }
         .prop-row input[type="number"] {
             width: 55px;
-            background: var(--bg-input);
+            background: var(--input);
             border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 2px 5px;
+            color: var(--text);
+            padding: 3px 5px;
             border-radius: 3px;
             text-align: center;
+            font-size: 11px;
         }
-
-        /* Status bar */
+        .prop-row span {
+            font-size: 11px;
+            color: var(--text2);
+        }
         .statusbar {
             height: 24px;
             background: #007acc;
-            color: white;
+            color: #fff;
             display: flex;
             align-items: center;
             padding: 0 12px;
@@ -270,16 +263,27 @@
             gap: 20px;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 7px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-panel);
+            background: var(--panel);
         }
         ::-webkit-scrollbar-thumb {
             background: #424242;
             border-radius: 4px;
+        }
+
+        .tooltip {
+            display: none;
+            position: fixed;
+            background: #000;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            pointer-events: none;
+            z-index: 999;
         }
     </style>
 </head>
@@ -287,29 +291,36 @@
 
     <!-- HEADER -->
     <div class="header">
-        <div class="logo"><i class="fa-solid fa-paint-brush"></i> PosterForge</div>
+        <div class="logo">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm3 3h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z" fill="currentColor"/></svg>
+            PosterForge
+        </div>
         <div class="header-actions">
-            <button class="btn" onclick="newDocument()"><i class="fa-solid fa-file"></i> Nouveau</button>
-            <button class="btn" onclick="downloadImage('png')"><i class="fa-solid fa-download"></i> PNG</button>
-            <button class="btn" onclick="downloadImage('jpeg')"><i class="fa-solid fa-download"></i> JPEG</button>
-            <button class="btn" onclick="undo()"><i class="fa-solid fa-rotate-left"></i></button>
-            <button class="btn" onclick="redo()"><i class="fa-solid fa-rotate-right"></i></button>
+            <button class="btn" onclick="newDocument()"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z"/></svg>Nouveau</button>
+            <button class="btn" onclick="openFile()"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></svg>Ouvrir</button>
+            <button class="btn" onclick="exportImage('png')"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>PNG</button>
+            <button class="btn" onclick="exportImage('jpeg')"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>JPEG</button>
+            <button class="btn" onclick="undo()"><svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62C8.64 11.04 10.43 10 12.5 10c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5H5c0 4.14 3.36 7.5 7.5 7.5s7.5-3.36 7.5-7.5S16.64 8 12.5 8z"/></svg></button>
+            <button class="btn" onclick="redo()"><svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.14 0-7.5 3.36-7.5 7.5S7.36 23 11.5 23s7.5-3.36 7.5-7.5H17c0 3.04-2.46 5.5-5.5 5.5S6 18.54 6 15.5 8.46 10 11.5 10c1.96 0 3.73.81 5 2.11L13 15h9V6l-3.6 4.6z"/></svg></button>
         </div>
     </div>
 
     <!-- MAIN -->
-    <div class="main-container">
+    <div class="main">
         <!-- TOOLBAR -->
         <div class="toolbar" id="toolbar">
-            <div class="tool-btn active" data-tool="select" title="Sélection (V)"><i class="fa-solid fa-arrow-pointer"></i></div>
-            <div class="tool-btn" data-tool="rectangle" title="Rectangle (R)"><i class="fa-regular fa-square"></i></div>
-            <div class="tool-btn" data-tool="circle" title="Cercle (C)"><i class="fa-regular fa-circle"></i></div>
-            <div class="tool-btn" data-tool="line" title="Ligne (L)"><i class="fa-solid fa-minus"></i></div>
-            <div class="tool-btn" data-tool="text" title="Texte (T)"><i class="fa-solid fa-font"></i></div>
-            <div class="tool-separator"></div>
-            <div class="tool-btn" data-tool="delete" title="Supprimer (Suppr)"><i class="fa-solid fa-trash-can"></i></div>
-            <div class="tool-btn" id="uploadImageBtn" title="Importer une image"><i class="fa-solid fa-image"></i></div>
-            <input type="file" id="fileInput" accept="image/*" style="display:none">
+            <div class="tool-btn active" data-tool="select" title="Déplacement (V)"><svg viewBox="0 0 24 24"><path d="M8 2l12 12h-5l-3 8-4-16z"/></svg></div>
+            <div class="tool-btn" data-tool="rectangle" title="Rectangle (R)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+            <div class="tool-btn" data-tool="ellipse" title="Ellipse (C)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+            <div class="tool-btn" data-tool="line" title="Ligne (L)"><svg viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" stroke-width="2"/></svg></div>
+            <div class="tool-btn" data-tool="text" title="Texte (T)"><svg viewBox="0 0 24 24"><text x="3" y="18" font-size="16" font-weight="bold" fill="currentColor">T</text></svg></div>
+            <div class="tool-btn" data-tool="brush" title="Pinceau (B)"><svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/></svg></div>
+            <div class="tool-btn" data-tool="eraser" title="Gomme (E)"><svg viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53a4.01 4.01 0 0 1-5.66 0L2.81 17c-.78-.79-.78-2.05 0-2.84l10.6-10.6c.79-.78 2.05-.78 2.83 0zM4.22 15.58l3.54 3.54c.78.79 2.04.79 2.83 0l3.54-3.54-6.37-6.37-3.54 3.54z"/></svg></div>
+            <div class="tool-btn" data-tool="eyedropper" title="Pipette (I)"><svg viewBox="0 0 24 24"><path d="M19.35 4.65l-1.41-1.41-6.53 6.53 1.41 1.41 6.53-6.53zM11 13l-1 1-6 6H2v-2l6-6 1-1 2 2z"/></svg></div>
+            <div class="tool-btn" data-tool="hand" title="Main (H)"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-4 0v-6m4-1h-5.29l-1.42-1.42A1 1 0 0 0 10.59 10H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6.59a2 2 0 0 0 1.41-.59l5.71-5.71A2 2 0 0 0 18 13z"/></svg></div>
+            <div class="tool-btn" data-tool="zoom" title="Zoom (Z)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/></svg></div>
+            <div class="tool-sep"></div>
+            <div class="tool-btn" data-tool="delete" title="Supprimer (Suppr)"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></div>
         </div>
 
         <!-- CANVAS -->
@@ -318,363 +329,286 @@
         </div>
 
         <!-- SIDEBAR -->
-        <div class="sidebar" id="sidebar">
-            <!-- Calques -->
+        <div class="sidebar">
             <div class="panel">
                 <div class="panel-title">Calques</div>
-                <div id="layersList" style="max-height:250px; overflow-y:auto;"></div>
-                <div style="margin-top:6px; display:flex; gap:4px;">
-                    <button class="btn" onclick="moveLayerUp()"><i class="fa-solid fa-arrow-up"></i></button>
-                    <button class="btn" onclick="moveLayerDown()"><i class="fa-solid fa-arrow-down"></i></button>
-                    <button class="btn" onclick="duplicateLayer()"><i class="fa-regular fa-copy"></i></button>
+                <div id="layersList" style="max-height:220px;overflow-y:auto;"></div>
+                <div style="margin-top:6px;display:flex;gap:4px;">
+                    <button class="btn" onclick="moveLayerUp()" style="padding:3px 8px;"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5H7z" fill="currentColor"/></svg></button>
+                    <button class="btn" onclick="moveLayerDown()" style="padding:3px 8px;"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5H7z" fill="currentColor"/></svg></button>
+                    <button class="btn" onclick="duplicateLayer()" style="padding:3px 8px;"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/></svg></button>
                 </div>
             </div>
-
-            <!-- Propriétés -->
             <div class="panel">
                 <div class="panel-title">Propriétés</div>
-                <div class="prop-row">
-                    <label>Couleur</label>
-                    <input type="color" id="fillColor" value="#cc0000" onchange="updateProperty('fill', this.value)">
-                </div>
-                <div class="prop-row">
-                    <label>Contour</label>
-                    <input type="color" id="strokeColor" value="#000000" onchange="updateProperty('stroke', this.value)">
-                </div>
-                <div class="prop-row">
-                    <label>Épaisseur</label>
-                    <input type="range" id="strokeWidth" min="0" max="20" value="2" oninput="updateProperty('strokeWidth', this.value)">
-                    <input type="number" id="strokeWidthNum" min="0" max="20" value="2" onchange="updateProperty('strokeWidth', this.value)">
-                </div>
-                <div class="prop-row">
-                    <label>Opacité</label>
-                    <input type="range" id="opacity" min="0" max="1" step="0.01" value="1" oninput="updateProperty('opacity', this.value)">
-                    <span id="opacityVal">100%</span>
-                </div>
+                <div class="prop-row"><label>Fond</label><input type="color" id="fillColor" value="#cc0000" onchange="updateProp('fill',this.value)"></div>
+                <div class="prop-row"><label>Contour</label><input type="color" id="strokeColor" value="#000000" onchange="updateProp('stroke',this.value)"></div>
+                <div class="prop-row"><label>Épaisseur</label><input type="range" id="strokeWidth" min="0" max="20" value="2" oninput="updateProp('strokeWidth',this.value)"><input type="number" id="strokeWidthNum" min="0" max="20" value="2" onchange="updateProp('strokeWidth',this.value)"></div>
+                <div class="prop-row"><label>Opacité</label><input type="range" id="opacity" min="0" max="1" step="0.01" value="1" oninput="updateProp('opacity',this.value)"><span id="opacityVal">100%</span></div>
             </div>
-
-            <!-- Taille de l'espace de travail -->
             <div class="panel">
                 <div class="panel-title">Document</div>
-                <div class="prop-row">
-                    <label>Largeur</label>
-                    <input type="number" id="canvasWidth" value="2480" min="100" max="8000">
-                </div>
-                <div class="prop-row">
-                    <label>Hauteur</label>
-                    <input type="number" id="canvasHeight" value="3508" min="100" max="8000">
-                </div>
-                <button class="btn" onclick="resizeCanvas()">Appliquer</button>
+                <div class="prop-row"><label>Largeur</label><input type="number" id="canvasW" value="2480" min="100" max="8000" style="width:70px;"></div>
+                <div class="prop-row"><label>Hauteur</label><input type="number" id="canvasH" value="3508" min="100" max="8000" style="width:70px;"></div>
+                <button class="btn" onclick="resizeCanvas()" style="font-size:11px;">Appliquer</button>
             </div>
         </div>
     </div>
 
-    <!-- Status bar -->
+    <!-- STATUSBAR -->
     <div class="statusbar">
-        <span id="canvasSizeInfo">2480 × 3508 px</span>
+        <span id="sizeInfo">2480 × 3508 px</span>
         <span id="zoomInfo">100%</span>
     </div>
 
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+
     <script>
-        // ==================== INITIALISATION ====================
+        // ==================== INITIALISATION DU CANVAS ====================
         const canvas = new fabric.Canvas('myCanvas', {
             width: 2480,
             height: 3508,
-            backgroundColor: '#050000',
+            backgroundColor: '#0a0a0a',
             preserveObjectStacking: true,
+            selection: true,
+            stopContextMenu: true,
+            fireRightClick: false,
         });
 
-        // Ajustement du canvas dans la zone visible (zoom automatique)
-        function fitCanvasToScreen() {
-            const wrapper = document.getElementById('canvasWrapper');
-            const scaleX = (wrapper.clientWidth - 40) / canvas.width;
-            const scaleY = (wrapper.clientHeight - 40) / canvas.height;
-            const scale = Math.min(scaleX, scaleY, 0.25); // max 25% de zoom
-            canvas.setZoom(scale);
-            canvas.setWidth(canvas.width * scale);
-            canvas.setHeight(canvas.height * scale);
+        // Variables globales
+        let currentTool = 'select';
+        let isDrawing = false;
+        let startX, startY, shape;
+        let originalViewportTransform;
+
+        // ==================== GESTION DU VIEWPORT (ZOOM + PAN) ====================
+        function fitCanvas() {
+            const wrap = document.getElementById('canvasWrapper');
+            const w = wrap.clientWidth;
+            const h = wrap.clientHeight;
+            const scale = Math.min(w / canvas.width, h / canvas.height, 0.3);
+            canvas.setViewportTransform([scale, 0, 0, scale, (w - canvas.width * scale) / 2, (h - canvas.height * scale) / 2]);
             canvas.renderAll();
-            updateStatusBar();
+            updateStatus();
         }
-        window.addEventListener('resize', fitCanvasToScreen);
-        fitCanvasToScreen();
+        window.addEventListener('resize', fitCanvas);
+        fitCanvas();
+
+        // Zoom molette
+        canvas.on('mouse:wheel', function(opt) {
+            const delta = opt.e.deltaY;
+            let zoom = canvas.getZoom();
+            zoom *= 0.999 ** delta;
+            zoom = Math.min(5, Math.max(0.05, zoom));
+            canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+            opt.e.preventDefault();
+            opt.e.stopPropagation();
+            updateStatus();
+        });
+
+        // Outil Main (H) : déplacement du viewport
+        function activateHandTool() {
+            canvas.selection = false;
+            canvas.defaultCursor = 'grab';
+            canvas.hoverCursor = 'grab';
+            canvas.on('mouse:down', function(opt) {
+                if (currentTool !== 'hand') return;
+                canvas.isDragging = true;
+                canvas.selection = false;
+                canvas.defaultCursor = 'grabbing';
+            });
+            canvas.on('mouse:move', function(opt) {
+                if (canvas.isDragging && currentTool === 'hand') {
+                    const e = opt.e;
+                    const vpt = canvas.viewportTransform;
+                    vpt[4] += e.movementX;
+                    vpt[5] += e.movementY;
+                    canvas.setViewportTransform(vpt);
+                    canvas.renderAll();
+                }
+            });
+            canvas.on('mouse:up', function() {
+                canvas.isDragging = false;
+                if (currentTool === 'hand') canvas.defaultCursor = 'grab';
+                updateStatus();
+            });
+        }
 
         // ==================== OUTILS ====================
-        let currentTool = 'select';
         const toolButtons = document.querySelectorAll('.tool-btn[data-tool]');
-        toolButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelector('.tool-btn.active')?.classList.remove('active');
-                btn.classList.add('active');
-                currentTool = btn.dataset.tool;
-                canvas.isDrawingMode = false;
-                canvas.selection = (currentTool === 'select');
-            });
-        });
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelector('.tool-btn.active')?.classList.remove('active');
+            const btn = document.querySelector(`.tool-btn[data-tool="${tool}"]`);
+            if (btn) btn.classList.add('active');
 
-        // Gestion des clics sur le canvas pour créer des formes
-        canvas.on('mouse:down', function(opt) {
-            if (currentTool === 'select' || currentTool === 'delete') return;
+            // Réinitialiser les modes
+            canvas.isDrawingMode = false;
+            canvas.selection = (tool === 'select');
+            canvas.defaultCursor = tool === 'hand' ? 'grab' : 'default';
+            canvas.hoverCursor = tool === 'hand' ? 'grab' : 'move';
 
-            const pointer = canvas.getPointer(opt.e);
-            let shape;
-
-            switch (currentTool) {
-                case 'rectangle':
-                    shape = new fabric.Rect({
-                        left: pointer.x,
-                        top: pointer.y,
-                        width: 200,
-                        height: 150,
-                        fill: document.getElementById('fillColor').value,
-                        stroke: document.getElementById('strokeColor').value,
-                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
-                        opacity: parseFloat(document.getElementById('opacity').value),
-                    });
-                    break;
-                case 'circle':
-                    shape = new fabric.Ellipse({
-                        left: pointer.x,
-                        top: pointer.y,
-                        rx: 100,
-                        ry: 80,
-                        fill: document.getElementById('fillColor').value,
-                        stroke: document.getElementById('strokeColor').value,
-                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
-                        opacity: parseFloat(document.getElementById('opacity').value),
-                    });
-                    break;
-                case 'line':
-                    shape = new fabric.Line([pointer.x, pointer.y, pointer.x + 200, pointer.y + 50], {
-                        stroke: document.getElementById('fillColor').value,
-                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
-                        opacity: parseFloat(document.getElementById('opacity').value),
-                    });
-                    break;
-                case 'text':
-                    shape = new fabric.IText('Texte', {
-                        left: pointer.x,
-                        top: pointer.y,
-                        fontFamily: 'Arial',
-                        fontSize: 120,
-                        fill: document.getElementById('fillColor').value,
-                        opacity: parseFloat(document.getElementById('opacity').value),
-                    });
-                    break;
-                default:
-                    return;
+            if (tool === 'brush') {
+                canvas.isDrawingMode = true;
+                canvas.freeDrawingBrush.width = 10;
+                canvas.freeDrawingBrush.color = document.getElementById('fillColor').value;
             }
-
-            if (shape) {
-                canvas.add(shape);
-                canvas.setActiveObject(shape);
-                saveState();
-                updateLayersPanel();
-            }
-        });
-
-        // Suppression d'objet via outil ou touche Suppr
-        function deleteSelected() {
-            const active = canvas.getActiveObject();
-            if (active) {
-                canvas.remove(active);
-                canvas.discardActiveObject();
-                saveState();
-                updateLayersPanel();
+            if (tool === 'hand') activateHandTool();
+            else {
+                // Supprimer les événements de la main
+                canvas.off('mouse:down');
+                canvas.off('mouse:move');
+                canvas.off('mouse:up');
             }
         }
-        document.querySelector('.tool-btn[data-tool="delete"]').addEventListener('click', deleteSelected);
+
+        toolButtons.forEach(btn => {
+            btn.addEventListener('click', () => setTool(btn.dataset.tool));
+        });
+
+        // Raccourcis clavier
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
-                    deleteSelected();
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            const key = e.key.toLowerCase();
+            if (e.ctrlKey && key === 'z') { e.preventDefault(); undo(); return; }
+            if (e.ctrlKey && key === 'y') { e.preventDefault(); redo(); return; }
+            if (key === 'delete' || key === 'backspace') { deleteSelected(); return; }
+            switch (key) {
+                case 'v': setTool('select'); break;
+                case 'r': setTool('rectangle'); break;
+                case 'c': setTool('ellipse'); break;
+                case 'l': setTool('line'); break;
+                case 't': setTool('text'); break;
+                case 'b': setTool('brush'); break;
+                case 'e': setTool('eraser'); break;
+                case 'i': setTool('eyedropper'); break;
+                case 'h': setTool('hand'); break;
+                case 'z': setTool('zoom'); break;
+            }
+        });
+
+        // ==================== CRÉATION D'OBJETS (formes, texte) ====================
+        canvas.on('mouse:down', function(opt) {
+            if (['select', 'hand', 'zoom', 'eyedropper', 'eraser', 'brush'].includes(currentTool)) return;
+            if (currentTool === 'delete') { deleteSelected(); return; }
+
+            const pointer = canvas.getPointer(opt.e);
+            startX = pointer.x;
+            startY = pointer.y;
+            isDrawing = true;
+
+            if (currentTool === 'text') {
+                // Créer un texte et entrer en édition
+                const txt = new fabric.IText('Texte', {
+                    left: startX,
+                    top: startY,
+                    fontFamily: 'Arial',
+                    fontSize: 120,
+                    fill: document.getElementById('fillColor').value,
+                    opacity: parseFloat(document.getElementById('opacity').value),
+                });
+                canvas.add(txt);
+                canvas.setActiveObject(txt);
+                txt.enterEditing();
+                saveState();
+                updateLayersPanel();
+                isDrawing = false;
+            } else {
+                // Formes : créer une forme provisoire
+                const fill = document.getElementById('fillColor').value;
+                const stroke = document.getElementById('strokeColor').value;
+                const sw = parseInt(document.getElementById('strokeWidth').value);
+                const op = parseFloat(document.getElementById('opacity').value);
+                switch (currentTool) {
+                    case 'rectangle':
+                        shape = new fabric.Rect({ left: startX, top: startY, width: 0, height: 0, fill, stroke, strokeWidth: sw, opacity: op });
+                        break;
+                    case 'ellipse':
+                        shape = new fabric.Ellipse({ left: startX, top: startY, rx: 0, ry: 0, fill, stroke, strokeWidth: sw, opacity: op });
+                        break;
+                    case 'line':
+                        shape = new fabric.Line([startX, startY, startX, startY], { stroke: fill, strokeWidth: sw, opacity: op });
+                        break;
+                }
+                if (shape) {
+                    canvas.add(shape);
+                    canvas.setActiveObject(shape);
                 }
             }
         });
 
-        // Import image
-        document.getElementById('uploadImageBtn').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
+        canvas.on('mouse:move', function(opt) {
+            if (!isDrawing || !shape) return;
+            const pointer = canvas.getPointer(opt.e);
+            if (currentTool === 'rectangle' || currentTool === 'ellipse') {
+                const w = pointer.x - startX;
+                const h = pointer.y - startY;
+                if (currentTool === 'rectangle') {
+                    shape.set({ width: Math.abs(w), height: Math.abs(h), left: w > 0 ? startX : pointer.x, top: h > 0 ? startY : pointer.y });
+                } else if (currentTool === 'ellipse') {
+                    shape.set({ rx: Math.abs(w) / 2, ry: Math.abs(h) / 2, left: Math.min(startX, pointer.x), top: Math.min(startY, pointer.y) });
+                }
+                canvas.renderAll();
+            } else if (currentTool === 'line') {
+                shape.set({ x2: pointer.x, y2: pointer.y });
+                canvas.renderAll();
+            }
         });
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                fabric.Image.fromURL(event.target.result, (img) => {
-                    img.scaleToWidth(canvas.width * 0.5);
-                    img.set({ left: 100, top: 100 });
-                    canvas.add(img);
-                    canvas.setActiveObject(img);
+
+        canvas.on('mouse:up', function() {
+            if (isDrawing && shape) {
+                // Si la forme est trop petite, la supprimer
+                if ((currentTool === 'rectangle' && shape.width < 2 && shape.height < 2) ||
+                    (currentTool === 'ellipse' && shape.rx < 2 && shape.ry < 2) ||
+                    (currentTool === 'line' && Math.hypot(shape.x2 - shape.x1, shape.y2 - shape.y1) < 2)) {
+                    canvas.remove(shape);
+                } else {
                     saveState();
                     updateLayersPanel();
-                });
-            };
-            reader.readAsDataURL(file);
-            this.value = '';
+                }
+                shape = null;
+            }
+            isDrawing = false;
         });
 
-        // ==================== HISTORIQUE (annuler/rétablir) ====================
-        const history = [];
-        let historyIndex = -1;
-        const MAX_HISTORY = 50;
-
-        function saveState() {
-            // Supprimer les états futurs si on est pas au bout
-            if (historyIndex < history.length - 1) {
-                history.splice(historyIndex + 1);
-            }
-            const json = JSON.stringify(canvas.toDatalessJSON(['selectable', 'evented']));
-            history.push(json);
-            if (history.length > MAX_HISTORY) history.shift();
-            historyIndex = history.length - 1;
-        }
-
-        function undo() {
-            if (historyIndex <= 0) return;
-            historyIndex--;
-            loadState(history[historyIndex]);
-        }
-
-        function redo() {
-            if (historyIndex >= history.length - 1) return;
-            historyIndex++;
-            loadState(history[historyIndex]);
-        }
-
-        function loadState(json) {
-            canvas.loadFromJSON(json, () => {
-                canvas.renderAll();
-                updateLayersPanel();
-            });
-        }
-
-        // Capture de l'état initial
-        canvas.on('object:modified', () => { saveState(); updateLayersPanel(); });
-        canvas.on('object:added', () => { if (!canvas.isLoading) { saveState(); updateLayersPanel(); } });
-        canvas.on('object:removed', () => { if (!canvas.isLoading) { saveState(); updateLayersPanel(); } });
-        saveState(); // état initial
-
-        // ==================== PANNEAU DES CALQUES ====================
-        function updateLayersPanel() {
-            const list = document.getElementById('layersList');
+        // Outil Gomme : supprimer l'objet cliqué
+        canvas.on('mouse:down', function(opt) {
+            if (currentTool !== 'eraser') return;
+            const pointer = canvas.getPointer(opt.e);
             const objects = canvas.getObjects();
-            let html = '';
             for (let i = objects.length - 1; i >= 0; i--) {
-                const obj = objects[i];
-                const name = obj.type === 'i-text' ? (obj.text || 'Texte') : (obj.type || 'Objet');
-                const isActive = canvas.getActiveObject() === obj;
-                const isVisible = obj.visible !== false;
-                html += `
-                <div class="layer-item ${isActive ? 'selected' : ''}" data-index="${i}" onclick="selectLayerByIndex(${i})">
-                    <i class="fa-solid fa-${obj.type === 'i-text' ? 'font' : obj.type === 'rect' ? 'square' : obj.type === 'ellipse' ? 'circle' : 'vector-square'}"></i>
-                    <span class="layer-name">${name}</span>
-                    <span class="layer-visibility ${!isVisible ? 'hidden' : ''}" onclick="event.stopPropagation(); toggleLayerVisibility(${i})">
-                        <i class="fa-solid fa-${isVisible ? 'eye' : 'eye-slash'}"></i>
-                    </span>
-                    <span class="layer-actions">
-                        <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteLayer(${i})" title="Supprimer"></i>
-                    </span>
-                </div>`;
-            }
-            list.innerHTML = html || '<div style="color:#666; padding:10px; text-align:center;">Aucun calque</div>';
-        }
-
-        function selectLayerByIndex(index) {
-            const obj = canvas.getObjects()[index];
-            if (obj) {
-                canvas.setActiveObject(obj);
-                canvas.renderAll();
-                updateLayersPanel();
-            }
-        }
-
-        function toggleLayerVisibility(index) {
-            const obj = canvas.getObjects()[index];
-            if (obj) {
-                obj.visible = !obj.visible;
-                canvas.renderAll();
-                updateLayersPanel();
-            }
-        }
-
-        function deleteLayer(index) {
-            const obj = canvas.getObjects()[index];
-            if (obj) {
-                canvas.remove(obj);
-                saveState();
-                updateLayersPanel();
-            }
-        }
-
-        function moveLayerUp() {
-            const active = canvas.getActiveObject();
-            if (!active) return;
-            const objects = canvas.getObjects();
-            const idx = objects.indexOf(active);
-            if (idx < objects.length - 1) {
-                canvas.moveTo(active, idx + 1);
-                saveState();
-                updateLayersPanel();
-            }
-        }
-
-        function moveLayerDown() {
-            const active = canvas.getActiveObject();
-            if (!active) return;
-            const objects = canvas.getObjects();
-            const idx = objects.indexOf(active);
-            if (idx > 0) {
-                canvas.moveTo(active, idx - 1);
-                saveState();
-                updateLayersPanel();
-            }
-        }
-
-        function duplicateLayer() {
-            const active = canvas.getActiveObject();
-            if (!active) return;
-            active.clone((cloned) => {
-                cloned.set({ left: active.left + 20, top: active.top + 20 });
-                canvas.add(cloned);
-                canvas.setActiveObject(cloned);
-                saveState();
-                updateLayersPanel();
-            });
-        }
-
-        // ==================== MISE À JOUR DES PROPRIÉTÉS ====================
-        function updateProperty(prop, value) {
-            const active = canvas.getActiveObject();
-            if (!active) return;
-
-            switch (prop) {
-                case 'fill':
-                    active.set('fill', value);
+                if (objects[i].containsPoint(pointer)) {
+                    canvas.remove(objects[i]);
+                    saveState();
+                    updateLayersPanel();
                     break;
-                case 'stroke':
-                    active.set('stroke', value);
-                    break;
-                case 'strokeWidth':
-                    const sw = parseInt(value);
-                    active.set('strokeWidth', sw);
-                    document.getElementById('strokeWidthNum').value = sw;
-                    break;
-                case 'opacity':
-                    const op = parseFloat(value);
-                    active.set('opacity', op);
-                    document.getElementById('opacityVal').textContent = Math.round(op * 100) + '%';
-                    break;
+                }
             }
-            canvas.renderAll();
-            saveState();
-        }
+        });
 
-        // Synchronise les sliders avec l'objet sélectionné
+        // Outil Pipette : récupérer la couleur du pixel cliqué
+        canvas.on('mouse:down', function(opt) {
+            if (currentTool !== 'eyedropper') return;
+            const pointer = canvas.getPointer(opt.e);
+            const ctx = canvas.getContext();
+            const pixel = ctx.getImageData(pointer.x * canvas.getZoom(), pointer.y * canvas.getZoom(), 1, 1).data;
+            const hex = '#' + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1);
+            document.getElementById('fillColor').value = hex;
+        });
+
+        // Outil Zoom : clic pour zoomer, Alt+clic pour dézoomer
+        canvas.on('mouse:down', function(opt) {
+            if (currentTool !== 'zoom') return;
+            const point = { x: opt.e.offsetX, y: opt.e.offsetY };
+            const zoom = opt.e.altKey ? canvas.getZoom() * 0.8 : canvas.getZoom() * 1.25;
+            canvas.zoomToPoint(point, Math.min(5, Math.max(0.05, zoom)));
+            updateStatus();
+        });
+
+        // ==================== SÉLECTION ET PROPRIÉTÉS ====================
         canvas.on('selection:created', updatePropsPanel);
         canvas.on('selection:updated', updatePropsPanel);
         canvas.on('selection:cleared', () => {
-            // Réinitialiser les valeurs par défaut si rien n'est sélectionné
             document.getElementById('fillColor').value = '#cc0000';
             document.getElementById('strokeColor').value = '#000000';
             document.getElementById('strokeWidth').value = 2;
@@ -696,62 +630,208 @@
             document.getElementById('opacityVal').textContent = Math.round(op * 100) + '%';
         }
 
-        // ==================== FONCTIONS DOCUMENT ====================
-        function newDocument() {
-            if (confirm('Créer un nouveau document ? Toutes les modifications seront perdues.')) {
-                canvas.clear();
-                canvas.backgroundColor = '#050000';
-                saveState();
-                updateLayersPanel();
-                fitCanvasToScreen();
+        function updateProp(prop, value) {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            switch (prop) {
+                case 'fill': obj.set('fill', value); break;
+                case 'stroke': obj.set('stroke', value); break;
+                case 'strokeWidth':
+                    const sw = parseInt(value);
+                    obj.set('strokeWidth', sw);
+                    document.getElementById('strokeWidthNum').value = sw;
+                    break;
+                case 'opacity':
+                    const op = parseFloat(value);
+                    obj.set('opacity', op);
+                    document.getElementById('opacityVal').textContent = Math.round(op * 100) + '%';
+                    break;
             }
+            canvas.renderAll();
+            saveState();
         }
 
-        function downloadImage(format) {
-            const dataURL = canvas.toDataURL({
-                format: format === 'jpeg' ? 'jpeg' : 'png',
-                quality: 1.0,
-                multiplier: 1, // taille réelle
+        // ==================== CALQUES ====================
+        function updateLayersPanel() {
+            const list = document.getElementById('layersList');
+            const objects = canvas.getObjects();
+            let html = '';
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                const name = obj.type === 'i-text' ? (obj.text?.slice(0, 20) || 'Texte') : (obj.type || 'Objet');
+                const active = canvas.getActiveObject() === obj;
+                const vis = obj.visible !== false;
+                html += `
+                <div class="layer-item ${active ? 'selected' : ''}" data-index="${i}" onclick="selectLayer(${i})">
+                    <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3z" fill="currentColor"/></svg>
+                    <span class="layer-name">${name}</span>
+                    <span class="layer-vis ${vis ? '' : 'hidden'}" onclick="event.stopPropagation();toggleLayerVis(${i})">
+                        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
+                    </span>
+                    <span class="layer-del" onclick="event.stopPropagation();deleteLayer(${i})">
+                        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/></svg>
+                    </span>
+                </div>`;
+            }
+            list.innerHTML = html || '<div style="color:#666;padding:10px;">Aucun calque</div>';
+        }
+
+        function selectLayer(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                canvas.setActiveObject(obj);
+                canvas.renderAll();
+                updateLayersPanel();
+            }
+        }
+        function toggleLayerVis(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                obj.visible = !obj.visible;
+                canvas.renderAll();
+                updateLayersPanel();
+            }
+        }
+        function deleteLayer(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                canvas.remove(obj);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+        function moveLayerUp() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            const objects = canvas.getObjects();
+            const idx = objects.indexOf(obj);
+            if (idx < objects.length - 1) {
+                canvas.moveTo(obj, idx + 1);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+        function moveLayerDown() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            const objects = canvas.getObjects();
+            const idx = objects.indexOf(obj);
+            if (idx > 0) {
+                canvas.moveTo(obj, idx - 1);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+        function duplicateLayer() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            obj.clone(cloned => {
+                cloned.set({ left: obj.left + 30, top: obj.top + 30 });
+                canvas.add(cloned);
+                canvas.setActiveObject(cloned);
+                saveState();
+                updateLayersPanel();
             });
+        }
+
+        // ==================== HISTORIQUE ====================
+        const history = [];
+        let historyIndex = -1;
+        const MAX_HIST = 60;
+        function saveState() {
+            if (historyIndex < history.length - 1) history.splice(historyIndex + 1);
+            history.push(JSON.stringify(canvas.toDatalessJSON()));
+            if (history.length > MAX_HIST) history.shift();
+            historyIndex = history.length - 1;
+        }
+        function undo() {
+            if (historyIndex <= 0) return;
+            historyIndex--;
+            loadState(history[historyIndex]);
+        }
+        function redo() {
+            if (historyIndex >= history.length - 1) return;
+            historyIndex++;
+            loadState(history[historyIndex]);
+        }
+        function loadState(json) {
+            canvas.loadFromJSON(json, () => {
+                canvas.renderAll();
+                updateLayersPanel();
+                updateStatus();
+            });
+        }
+        canvas.on('object:added', () => saveState());
+        canvas.on('object:removed', () => saveState());
+        canvas.on('object:modified', () => saveState());
+        saveState(); // état initial
+
+        // ==================== FONCTIONS ANNEXES ====================
+        function deleteSelected() {
+            const obj = canvas.getActiveObject();
+            if (obj) {
+                canvas.remove(obj);
+                canvas.discardActiveObject();
+                saveState();
+                updateLayersPanel();
+            }
+        }
+        function newDocument() {
+            if (confirm('Créer un nouveau document ?')) {
+                canvas.clear();
+                canvas.backgroundColor = '#0a0a0a';
+                saveState();
+                updateLayersPanel();
+                fitCanvas();
+            }
+        }
+        function openFile() {
+            document.getElementById('fileInput').click();
+        }
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                fabric.Image.fromURL(ev.target.result, img => {
+                    img.scaleToWidth(canvas.width * 0.6);
+                    img.set({ left: 100, top: 100 });
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    saveState();
+                    updateLayersPanel();
+                });
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+        function exportImage(format) {
+            const dataURL = canvas.toDataURL({ format, quality: 1.0, multiplier: 1 });
             const link = document.createElement('a');
             link.href = dataURL;
             link.download = `poster.${format}`;
             link.click();
         }
-
         function resizeCanvas() {
-            const w = parseInt(document.getElementById('canvasWidth').value) || 2480;
-            const h = parseInt(document.getElementById('canvasHeight').value) || 3508;
-            canvas.setWidth(w);
-            canvas.setHeight(h);
-            fitCanvasToScreen();
-            saveState();
-            updateStatusBar();
+            const w = parseInt(document.getElementById('canvasW').value);
+            const h = parseInt(document.getElementById('canvasH').value);
+            if (w > 0 && h > 0) {
+                canvas.setWidth(w);
+                canvas.setHeight(h);
+                fitCanvas();
+                saveState();
+                updateStatus();
+            }
         }
-
-        function updateStatusBar() {
-            document.getElementById('canvasSizeInfo').textContent = `${canvas.width} × ${canvas.height} px`;
+        function updateStatus() {
             const zoom = Math.round(canvas.getZoom() * 100);
+            document.getElementById('sizeInfo').textContent = `${canvas.width} × ${canvas.height} px`;
             document.getElementById('zoomInfo').textContent = `${zoom}%`;
         }
 
-        // Raccourcis clavier
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
-            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
-            if (e.key === 'v') currentTool = 'select'; // V pour sélection
-            if (e.key === 'r') currentTool = 'rectangle';
-            if (e.key === 'c') currentTool = 'circle';
-            if (e.key === 'l') currentTool = 'line';
-            if (e.key === 't') currentTool = 'text';
-        });
-
-        // Initialiser les calques
+        // Init
         updateLayersPanel();
-        updateStatusBar();
-
-        // Empêcher la sélection par défaut du navigateur sur le canvas
-        document.getElementById('myCanvas').addEventListener('selectstart', (e) => e.preventDefault());
+        updateStatus();
     </script>
 </body>
 </html>
