@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horror Poster Generator - Deadly Dead</title>
-    
-    <!-- Pyodide - Python dans le navigateur -->
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
-    
+    <title>PosterForge – Éditeur d'affiches en ligne</title>
+    <!-- Icônes Font Awesome (pro, sans emoji) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Fabric.js pour le canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <style>
         :root {
-            --blood: #cc0000;
-            --dark: #0a0a0a;
+            --bg-dark: #1e1e1e;
+            --bg-panel: #252526;
+            --bg-input: #333333;
+            --text-primary: #cccccc;
+            --text-secondary: #999999;
+            --border: #3c3c3c;
+            --accent: #0078d4;
+            --accent-hover: #1a8ad4;
+            --danger: #d32f2f;
+            --sidebar-width: 260px;
+            --toolbar-width: 48px;
+            --header-height: 40px;
         }
 
         * {
@@ -21,530 +31,727 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #0a0a0a 100%);
-            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 700px;
-            width: 100%;
-            padding: 30px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.85);
-            border: 2px solid #3a0000;
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.2), inset 0 0 50px rgba(255, 0, 0, 0.05);
-        }
-
-        h1 {
-            font-size: 2.5em;
-            color: #cc0000;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 3px 3px 0 #000;
-            margin-bottom: 5px;
-            letter-spacing: 4px;
-        }
-
-        .tagline {
-            color: #999;
-            font-size: 1em;
-            letter-spacing: 3px;
-            margin-bottom: 25px;
-        }
-
-        .poster-preview {
-            width: 220px;
-            height: 311px;
-            margin: 20px auto;
-            border: 3px solid #3a0000;
-            border-radius: 8px;
+            flex-direction: column;
             overflow: hidden;
-            background: #000;
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            user-select: none;
+        }
+
+        /* ========== HEADER ========== */
+        .header {
+            height: var(--header-height);
+            background: #2d2d30;
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding: 0 12px;
+            border-bottom: 1px solid var(--border);
+            gap: 20px;
+            z-index: 100;
         }
 
-        .poster-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .logo {
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+        .logo i {
+            margin-right: 6px;
+            color: var(--accent);
         }
 
-        .placeholder-icon {
-            font-size: 4em;
-            opacity: 0.3;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .specs {
+        .header-actions {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .spec {
-            background: rgba(255, 0, 0, 0.08);
-            border: 1px solid #3a0000;
-            padding: 12px 18px;
-            border-radius: 8px;
-            color: #ccc;
-            font-size: 0.85em;
-        }
-
-        .spec strong {
-            color: #cc0000;
-            display: block;
-            font-size: 1.1em;
+            gap: 6px;
+            margin-left: auto;
         }
 
         .btn {
-            display: inline-block;
-            padding: 16px 45px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(180deg, #cc0000 0%, #660000 100%);
-            border: 2px solid #990000;
-            border-radius: 10px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 5px 14px;
+            border-radius: 4px;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 25px rgba(255, 0, 0, 0.4);
-            margin: 10px 5px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s;
         }
-
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 35px rgba(255, 0, 0, 0.6);
-            background: linear-gradient(180deg, #dd1111 0%, #770000 100%);
+            background: #3e3e42;
+        }
+        .btn i {
+            font-size: 14px;
         }
 
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-small {
-            padding: 10px 25px;
-            font-size: 0.9em;
-            letter-spacing: 2px;
-        }
-
-        .progress-bar {
-            display: none;
-            width: 100%;
-            max-width: 400px;
-            height: 8px;
-            background: #1a0000;
-            border-radius: 10px;
-            margin: 15px auto;
+        /* ========== MAIN LAYOUT ========== */
+        .main-container {
+            display: flex;
+            flex: 1;
             overflow: hidden;
-            border: 1px solid #3a0000;
         }
 
-        .progress-bar .fill {
-            height: 100%;
-            background: linear-gradient(90deg, #660000, #cc0000);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-            width: 0%;
+        /* ========== TOOLBAR (gauche) ========== */
+        .toolbar {
+            width: var(--toolbar-width);
+            background: #2d2d30;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            gap: 4px;
         }
 
-        .status {
-            display: none;
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 10px;
+        .tool-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .tool-btn:hover {
+            background: #3e3e42;
+        }
+        .tool-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        .tool-btn i {
+            font-size: 18px;
         }
 
-        .error-msg {
-            color: #ff4444;
-            background: rgba(255, 0, 0, 0.1);
+        .tool-separator {
+            width: 28px;
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        /* ========== CANVAS AREA (centre) ========== */
+        .canvas-area {
+            flex: 1;
+            background: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-container {
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* ========== SIDEBAR (droite) ========== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel {
             padding: 10px;
-            border-radius: 8px;
-            margin-top: 15px;
-            display: none;
+            border-bottom: 1px solid var(--border);
         }
 
-        .footer-note {
-            margin-top: 25px;
-            color: #666;
-            font-size: 0.75em;
+        .panel-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        @media (max-width: 500px) {
-            .container { padding: 20px 15px; }
-            h1 { font-size: 1.8em; }
-            .btn { padding: 14px 30px; font-size: 1em; }
+        /* Layers */
+        .layer-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 6px;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .layer-item:hover {
+            background: #2a2a2e;
+        }
+        .layer-item.selected {
+            background: var(--accent);
+        }
+        .layer-item i {
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+            color: #aaa;
+        }
+        .layer-item .layer-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .layer-item .layer-visibility {
+            cursor: pointer;
+            color: #aaa;
+            font-size: 14px;
+        }
+        .layer-item .layer-visibility.hidden {
+            color: #555;
+        }
+        .layer-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .layer-actions i {
+            cursor: pointer;
+            font-size: 13px;
+            padding: 2px;
+        }
+
+        /* Properties */
+        .prop-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .prop-row label {
+            width: 55px;
+            color: var(--text-secondary);
+        }
+        .prop-row input[type="color"] {
+            width: 32px;
+            height: 24px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            cursor: pointer;
+        }
+        .prop-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent);
+        }
+        .prop-row input[type="number"] {
+            width: 55px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 2px 5px;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        /* Status bar */
+        .statusbar {
+            height: 24px;
+            background: #007acc;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 11px;
+            gap: 20px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-panel);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>DEADLY DEAD</h1>
-    <p class="tagline">HORROR POSTER GENERATOR</p>
-
-    <!-- Aperçu -->
-    <div class="poster-preview" id="previewBox">
-        <span class="placeholder-icon" id="placeholderIcon">💀</span>
-        <img id="previewImg" style="display:none;" alt="Poster preview">
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo"><i class="fa-solid fa-paint-brush"></i> PosterForge</div>
+        <div class="header-actions">
+            <button class="btn" onclick="newDocument()"><i class="fa-solid fa-file"></i> Nouveau</button>
+            <button class="btn" onclick="downloadImage('png')"><i class="fa-solid fa-download"></i> PNG</button>
+            <button class="btn" onclick="downloadImage('jpeg')"><i class="fa-solid fa-download"></i> JPEG</button>
+            <button class="btn" onclick="undo()"><i class="fa-solid fa-rotate-left"></i></button>
+            <button class="btn" onclick="redo()"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
     </div>
 
-    <!-- Spécifications -->
-    <div class="specs">
-        <div class="spec"><strong>A4</strong> 2480 × 3508</div>
-        <div class="spec"><strong>300</strong> DPI</div>
-        <div class="spec"><strong>PNG</strong> HD Quality</div>
-        <div class="spec"><strong>Horror</strong> Style</div>
+    <!-- MAIN -->
+    <div class="main-container">
+        <!-- TOOLBAR -->
+        <div class="toolbar" id="toolbar">
+            <div class="tool-btn active" data-tool="select" title="Sélection (V)"><i class="fa-solid fa-arrow-pointer"></i></div>
+            <div class="tool-btn" data-tool="rectangle" title="Rectangle (R)"><i class="fa-regular fa-square"></i></div>
+            <div class="tool-btn" data-tool="circle" title="Cercle (C)"><i class="fa-regular fa-circle"></i></div>
+            <div class="tool-btn" data-tool="line" title="Ligne (L)"><i class="fa-solid fa-minus"></i></div>
+            <div class="tool-btn" data-tool="text" title="Texte (T)"><i class="fa-solid fa-font"></i></div>
+            <div class="tool-separator"></div>
+            <div class="tool-btn" data-tool="delete" title="Supprimer (Suppr)"><i class="fa-solid fa-trash-can"></i></div>
+            <div class="tool-btn" id="uploadImageBtn" title="Importer une image"><i class="fa-solid fa-image"></i></div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </div>
+
+        <!-- CANVAS -->
+        <div class="canvas-area" id="canvasWrapper">
+            <canvas id="myCanvas"></canvas>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <!-- Calques -->
+            <div class="panel">
+                <div class="panel-title">Calques</div>
+                <div id="layersList" style="max-height:250px; overflow-y:auto;"></div>
+                <div style="margin-top:6px; display:flex; gap:4px;">
+                    <button class="btn" onclick="moveLayerUp()"><i class="fa-solid fa-arrow-up"></i></button>
+                    <button class="btn" onclick="moveLayerDown()"><i class="fa-solid fa-arrow-down"></i></button>
+                    <button class="btn" onclick="duplicateLayer()"><i class="fa-regular fa-copy"></i></button>
+                </div>
+            </div>
+
+            <!-- Propriétés -->
+            <div class="panel">
+                <div class="panel-title">Propriétés</div>
+                <div class="prop-row">
+                    <label>Couleur</label>
+                    <input type="color" id="fillColor" value="#cc0000" onchange="updateProperty('fill', this.value)">
+                </div>
+                <div class="prop-row">
+                    <label>Contour</label>
+                    <input type="color" id="strokeColor" value="#000000" onchange="updateProperty('stroke', this.value)">
+                </div>
+                <div class="prop-row">
+                    <label>Épaisseur</label>
+                    <input type="range" id="strokeWidth" min="0" max="20" value="2" oninput="updateProperty('strokeWidth', this.value)">
+                    <input type="number" id="strokeWidthNum" min="0" max="20" value="2" onchange="updateProperty('strokeWidth', this.value)">
+                </div>
+                <div class="prop-row">
+                    <label>Opacité</label>
+                    <input type="range" id="opacity" min="0" max="1" step="0.01" value="1" oninput="updateProperty('opacity', this.value)">
+                    <span id="opacityVal">100%</span>
+                </div>
+            </div>
+
+            <!-- Taille de l'espace de travail -->
+            <div class="panel">
+                <div class="panel-title">Document</div>
+                <div class="prop-row">
+                    <label>Largeur</label>
+                    <input type="number" id="canvasWidth" value="2480" min="100" max="8000">
+                </div>
+                <div class="prop-row">
+                    <label>Hauteur</label>
+                    <input type="number" id="canvasHeight" value="3508" min="100" max="8000">
+                </div>
+                <button class="btn" onclick="resizeCanvas()">Appliquer</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Barre de progression -->
-    <div class="progress-bar" id="progressBar">
-        <div class="fill" id="progressFill"></div>
+    <!-- Status bar -->
+    <div class="statusbar">
+        <span id="canvasSizeInfo">2480 × 3508 px</span>
+        <span id="zoomInfo">100%</span>
     </div>
-    <div class="status" id="statusMsg">⏳ Chargement de Python...</div>
-    <div class="error-msg" id="errorMsg"></div>
 
-    <!-- Boutons -->
-    <button class="btn" id="btnGenerate" onclick="generatePoster()">
-        🎬 Générer l'affiche
-    </button>
-    <br>
-    <button class="btn btn-small" id="btnDownload" onclick="downloadPoster()" disabled style="display:none;">
-        ⬇️ Télécharger le PNG
-    </button>
+    <script>
+        // ==================== INITIALISATION ====================
+        const canvas = new fabric.Canvas('myCanvas', {
+            width: 2480,
+            height: 3508,
+            backgroundColor: '#050000',
+            preserveObjectStacking: true,
+        });
 
-    <p class="footer-note">⚡ Aucun serveur • 100% navigateur • Python via Pyodide</p>
-</div>
+        // Ajustement du canvas dans la zone visible (zoom automatique)
+        function fitCanvasToScreen() {
+            const wrapper = document.getElementById('canvasWrapper');
+            const scaleX = (wrapper.clientWidth - 40) / canvas.width;
+            const scaleY = (wrapper.clientHeight - 40) / canvas.height;
+            const scale = Math.min(scaleX, scaleY, 0.25); // max 25% de zoom
+            canvas.setZoom(scale);
+            canvas.setWidth(canvas.width * scale);
+            canvas.setHeight(canvas.height * scale);
+            canvas.renderAll();
+            updateStatusBar();
+        }
+        window.addEventListener('resize', fitCanvasToScreen);
+        fitCanvasToScreen();
 
-<script>
-    let pyodide = null;
-    let posterBytes = null;
-    let isPyodideReady = false;
-
-    // Éléments DOM
-    const btnGenerate = document.getElementById('btnGenerate');
-    const btnDownload = document.getElementById('btnDownload');
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    const statusMsg = document.getElementById('statusMsg');
-    const errorMsg = document.getElementById('errorMsg');
-    const previewImg = document.getElementById('previewImg');
-    const placeholderIcon = document.getElementById('placeholderIcon');
-
-    // Met à jour la barre de progression
-    function updateProgress(percent, message) {
-        progressBar.style.display = 'block';
-        statusMsg.style.display = 'block';
-        progressFill.style.width = percent + '%';
-        statusMsg.textContent = message;
-    }
-
-    // Cache la barre de progression
-    function hideProgress() {
-        progressBar.style.display = 'none';
-        statusMsg.style.display = 'none';
-    }
-
-    // Affiche une erreur
-    function showError(msg) {
-        errorMsg.textContent = '❌ ' + msg;
-        errorMsg.style.display = 'block';
-        hideProgress();
-        btnGenerate.disabled = false;
-    }
-
-    // Cache l'erreur
-    function clearError() {
-        errorMsg.style.display = 'none';
-    }
-
-    // Charge Pyodide au démarrage
-    async function loadPyodide() {
-        if (isPyodideReady) return;
-        
-        btnGenerate.disabled = true;
-        updateProgress(10, '⏳ Téléchargement de Pyodide (Python pour navigateur)...');
-        
-        try {
-            pyodide = await loadPyodide({
-                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
+        // ==================== OUTILS ====================
+        let currentTool = 'select';
+        const toolButtons = document.querySelectorAll('.tool-btn[data-tool]');
+        toolButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector('.tool-btn.active')?.classList.remove('active');
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+                canvas.isDrawingMode = false;
+                canvas.selection = (currentTool === 'select');
             });
-            
-            updateProgress(40, '📦 Installation de Pillow...');
-            await pyodide.loadPackage('pillow');
-            
-            updateProgress(70, '📦 Installation de NumPy...');
-            await pyodide.loadPackage('numpy');
-            
-            updateProgress(100, '✅ Prêt ! Clique sur Générer.');
-            
-            isPyodideReady = true;
-            btnGenerate.disabled = false;
-            
-            setTimeout(hideProgress, 2000);
-            
-        } catch (err) {
-            showError('Impossible de charger Python : ' + err.message);
+        });
+
+        // Gestion des clics sur le canvas pour créer des formes
+        canvas.on('mouse:down', function(opt) {
+            if (currentTool === 'select' || currentTool === 'delete') return;
+
+            const pointer = canvas.getPointer(opt.e);
+            let shape;
+
+            switch (currentTool) {
+                case 'rectangle':
+                    shape = new fabric.Rect({
+                        left: pointer.x,
+                        top: pointer.y,
+                        width: 200,
+                        height: 150,
+                        fill: document.getElementById('fillColor').value,
+                        stroke: document.getElementById('strokeColor').value,
+                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
+                        opacity: parseFloat(document.getElementById('opacity').value),
+                    });
+                    break;
+                case 'circle':
+                    shape = new fabric.Ellipse({
+                        left: pointer.x,
+                        top: pointer.y,
+                        rx: 100,
+                        ry: 80,
+                        fill: document.getElementById('fillColor').value,
+                        stroke: document.getElementById('strokeColor').value,
+                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
+                        opacity: parseFloat(document.getElementById('opacity').value),
+                    });
+                    break;
+                case 'line':
+                    shape = new fabric.Line([pointer.x, pointer.y, pointer.x + 200, pointer.y + 50], {
+                        stroke: document.getElementById('fillColor').value,
+                        strokeWidth: parseInt(document.getElementById('strokeWidth').value),
+                        opacity: parseFloat(document.getElementById('opacity').value),
+                    });
+                    break;
+                case 'text':
+                    shape = new fabric.IText('Texte', {
+                        left: pointer.x,
+                        top: pointer.y,
+                        fontFamily: 'Arial',
+                        fontSize: 120,
+                        fill: document.getElementById('fillColor').value,
+                        opacity: parseFloat(document.getElementById('opacity').value),
+                    });
+                    break;
+                default:
+                    return;
+            }
+
+            if (shape) {
+                canvas.add(shape);
+                canvas.setActiveObject(shape);
+                saveState();
+                updateLayersPanel();
+            }
+        });
+
+        // Suppression d'objet via outil ou touche Suppr
+        function deleteSelected() {
+            const active = canvas.getActiveObject();
+            if (active) {
+                canvas.remove(active);
+                canvas.discardActiveObject();
+                saveState();
+                updateLayersPanel();
+            }
         }
-    }
+        document.querySelector('.tool-btn[data-tool="delete"]').addEventListener('click', deleteSelected);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                    deleteSelected();
+                }
+            }
+        });
 
-    // Génère l'affiche
-    async function generatePoster() {
-        if (!isPyodideReady) {
-            showError('Python n\'est pas encore chargé. Attends quelques secondes...');
-            return;
+        // Import image
+        document.getElementById('uploadImageBtn').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                fabric.Image.fromURL(event.target.result, (img) => {
+                    img.scaleToWidth(canvas.width * 0.5);
+                    img.set({ left: 100, top: 100 });
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                    saveState();
+                    updateLayersPanel();
+                });
+            };
+            reader.readAsDataURL(file);
+            this.value = '';
+        });
+
+        // ==================== HISTORIQUE (annuler/rétablir) ====================
+        const history = [];
+        let historyIndex = -1;
+        const MAX_HISTORY = 50;
+
+        function saveState() {
+            // Supprimer les états futurs si on est pas au bout
+            if (historyIndex < history.length - 1) {
+                history.splice(historyIndex + 1);
+            }
+            const json = JSON.stringify(canvas.toDatalessJSON(['selectable', 'evented']));
+            history.push(json);
+            if (history.length > MAX_HISTORY) history.shift();
+            historyIndex = history.length - 1;
         }
-        
-        clearError();
-        btnGenerate.disabled = true;
-        btnDownload.style.display = 'none';
-        btnDownload.disabled = true;
-        updateProgress(0, '🎨 Génération du fond...');
-        
-        try {
-            const pythonCode = `
-import numpy as np
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
-import math
-import random
-import io
-import base64
 
-W, H = 2480, 3508
-CENTER = (W//2, H//2)
-
-# --- FOND NOIR TEXTURÉ ---
-bg = Image.new('RGB', (W, H), (5, 0, 2))
-draw = ImageDraw.Draw(bg)
-
-# Dégradé radial rouge sombre
-for y in range(0, H, 12):
-    for x in range(0, W, 12):
-        dx = x - CENTER[0]
-        dy = y - CENTER[1]
-        dist = math.sqrt(dx*dx + dy*dy)
-        val = int(25 * max(0, 1 - dist/1800))
-        draw.rectangle([x, y, x+12, y+12], fill=(val, 0, 0))
-
-# Vignette noire
-vignette = Image.new('L', (W, H), 0)
-v_draw = ImageDraw.Draw(vignette)
-for y in range(0, H, 10):
-    for x in range(0, W, 10):
-        dx = x - CENTER[0]
-        dy = y - CENTER[1]
-        dist = math.sqrt(dx*dx + dy*dy)
-        alpha = int(180 * (dist / 2000) ** 1.5)
-        alpha = min(180, alpha)
-        v_draw.rectangle([x, y, x+10, y+10], fill=alpha)
-vignette = vignette.filter(ImageFilter.GaussianBlur(radius=25))
-bg.paste((0, 0, 0), mask=vignette)
-
-# Bruit / grain
-noise = np.random.normal(0, 10, (H, W, 3)).astype(np.int16)
-bg_arr = np.array(bg).astype(np.int16) + noise
-bg_arr = np.clip(bg_arr, 0, 255).astype(np.uint8)
-bg = Image.fromarray(bg_arr)
-
-# Brume en bas
-mist = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-m_draw = ImageDraw.Draw(mist)
-for _ in range(30):
-    mx = random.randint(0, W)
-    my = random.randint(int(H*0.7), H)
-    mr = random.randint(200, 500)
-    ma = random.randint(5, 20)
-    m_draw.ellipse([mx-mr, my-mr, mx+mr, my+mr], fill=(40, 0, 0, ma))
-mist = mist.filter(ImageFilter.GaussianBlur(radius=50))
-bg = Image.alpha_composite(bg.convert('RGBA'), mist).convert('RGB')
-
-# --- EFFETS HORREUR ---
-fx = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-fx_draw = ImageDraw.Draw(fx)
-
-# Griffures
-for _ in range(25):
-    x = random.randint(0, W)
-    y = random.randint(0, H)
-    angle = random.uniform(0, 2*math.pi)
-    length = random.randint(60, 250)
-    dx = length * math.cos(angle)
-    dy = length * math.sin(angle)
-    for i in range(3):
-        fx_draw.line([(x+i, y+i), (x+dx+i, y+dy+i)], fill=(0, 0, 0, random.randint(30, 80)), width=1)
-
-# Éclaboussures de sang
-for _ in range(18):
-    cx = random.randint(100, W-100)
-    cy = random.randint(100, H-400)
-    size = random.randint(15, 50)
-    alpha = random.randint(40, 90)
-    fx_draw.ellipse([cx-size, cy-size, cx+size, cy+size], fill=(140, 0, 0, alpha))
-    for _ in range(3):
-        sx = cx + random.randint(-size, size)
-        sy = cy + random.randint(-size, size)
-        sr = random.randint(3, 8)
-        fx_draw.ellipse([sx-sr, sy-sr, sx+sr, sy+sr], fill=(100, 0, 0, alpha//2))
-
-# Coulures verticales
-for _ in range(10):
-    x = random.randint(100, W-100)
-    y_start = random.randint(300, 1600)
-    length = random.randint(60, 200)
-    for step in range(length):
-        alpha = max(0, 100 - step)
-        fx_draw.ellipse([x-3, y_start+step, x+3, y_start+step+8], fill=(80, 0, 0, alpha))
-
-# --- TITRE ---
-title = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-t_draw = ImageDraw.Draw(title)
-
-# Police par défaut (grande taille)
-try:
-    font1 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 350)
-    font2 = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 460)
-except:
-    font1 = ImageFont.load_default()
-    font2 = font1
-
-text1 = "DEADLY"
-text2 = "DEAD"
-y1 = 1000
-y2 = y1 + 450
-
-# Ombres
-for off in [(8,8), (12,12), (16,16)]:
-    t_draw.text((CENTER[0], y1), text1, font=font1, fill=(0,0,0,160), anchor='mm', stroke_width=off[0], stroke_fill=(0,0,0,80))
-    t_draw.text((CENTER[0], y2), text2, font=font2, fill=(0,0,0,160), anchor='mm', stroke_width=off[0], stroke_fill=(0,0,0,80))
-
-# Texte rouge sang
-t_draw.text((CENTER[0], y1), text1, font=font1, fill=(200, 15, 15, 255), anchor='mm', stroke_width=10, stroke_fill=(50, 0, 0, 255))
-t_draw.text((CENTER[0], y2), text2, font=font2, fill=(220, 18, 18, 255), anchor='mm', stroke_width=14, stroke_fill=(70, 0, 0, 255))
-
-# Coulures depuis le titre
-bleed_pts = [(CENTER[0]-280, y2+160), (CENTER[0]+60, y2+220), (CENTER[0]+230, y2+130)]
-for bx, by in bleed_pts:
-    blen = random.randint(80, 180)
-    for d in range(blen):
-        alpha = max(0, 140 - d)
-        t_draw.ellipse([bx-3, by+d, bx+3, by+d+10], fill=(170, 0, 0, alpha))
-
-# --- SOUS-TITRE ---
-sub = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-s_draw = ImageDraw.Draw(sub)
-try:
-    sub_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 120)
-except:
-    sub_font = ImageFont.load_default()
-
-y_sub = 2300
-s_draw.text((CENTER[0], y_sub), "THEY ARE COMING BACK", font=sub_font, fill=(210, 210, 210, 220), anchor='mm', stroke_width=4, stroke_fill=(0, 0, 0, 180))
-
-# Lignes décoratives
-for ly in [y_sub-80, y_sub+80]:
-    s_draw.line([(W//4, ly), (3*W//4, ly)], fill=(150, 0, 0, 180), width=3)
-
-# --- FOOTER ---
-foot = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-f_draw = ImageDraw.Draw(foot)
-try:
-    foot_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 70)
-except:
-    foot_font = ImageFont.load_default()
-
-y_ft = 3150
-f_draw.text((CENTER[0], y_ft), "COMING SOON", font=foot_font, fill=(150, 150, 150, 190), anchor='mm', stroke_width=2, stroke_fill=(0, 0, 0, 150))
-
-# --- ASSEMBLAGE FINAL ---
-final = bg.convert('RGBA')
-final = Image.alpha_composite(final, fx)
-final = Image.alpha_composite(final, sub)
-final = Image.alpha_composite(final, title)
-final = Image.alpha_composite(final, foot)
-
-# Redimensionner pour aperçu (plus petit)
-preview = final.copy()
-preview.thumbnail((500, 707), Image.LANCZOS)
-
-# Convertir en base64 pour aperçu
-buf_preview = io.BytesIO()
-preview.convert('RGB').save(buf_preview, format='JPEG', quality=85)
-buf_preview.seek(0)
-preview_b64 = base64.b64encode(buf_preview.read()).decode('utf-8')
-
-# Image HD pour téléchargement
-buf_hd = io.BytesIO()
-final.convert('RGB').save(buf_hd, format='PNG')
-buf_hd.seek(0)
-hd_b64 = base64.b64encode(buf_hd.read()).decode('utf-8')
-
-preview_b64, hd_b64
-`;
-            
-            updateProgress(20, '🎨 Exécution du script Python...');
-            
-            // Exécute le code Python
-            const result = await pyodide.runPythonAsync(pythonCode);
-            
-            updateProgress(80, '🖼️ Rendu de l\'image...');
-            
-            // Récupère les images
-            const [previewB64, hdB64] = result.toJs();
-            
-            // Affiche l'aperçu
-            previewImg.src = 'data:image/jpeg;base64,' + previewB64;
-            previewImg.style.display = 'block';
-            placeholderIcon.style.display = 'none';
-            
-            // Stocke l'image HD pour téléchargement
-            posterBytes = hdB64;
-            
-            // Active le bouton de téléchargement
-            btnDownload.style.display = 'inline-block';
-            btnDownload.disabled = false;
-            
-            updateProgress(100, '✅ Affiche générée avec succès !');
-            
-            setTimeout(hideProgress, 2500);
-            btnGenerate.disabled = false;
-            btnGenerate.textContent = '🔄 Regénérer';
-            
-        } catch (err) {
-            showError('Erreur lors de la génération : ' + err.message);
-            btnGenerate.textContent = '🎬 Générer l\'affiche';
+        function undo() {
+            if (historyIndex <= 0) return;
+            historyIndex--;
+            loadState(history[historyIndex]);
         }
-    }
 
-    // Télécharge l'affiche en HD
-    function downloadPoster() {
-        if (!posterBytes) return;
-        
-        const link = document.createElement('a');
-        link.href = 'data:image/png;base64,' + posterBytes;
-        link.download = 'deadly_dead_poster.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+        function redo() {
+            if (historyIndex >= history.length - 1) return;
+            historyIndex++;
+            loadState(history[historyIndex]);
+        }
 
-    // Lance le chargement de Pyodide au démarrage
-    loadPyodide();
-</script>
+        function loadState(json) {
+            canvas.loadFromJSON(json, () => {
+                canvas.renderAll();
+                updateLayersPanel();
+            });
+        }
+
+        // Capture de l'état initial
+        canvas.on('object:modified', () => { saveState(); updateLayersPanel(); });
+        canvas.on('object:added', () => { if (!canvas.isLoading) { saveState(); updateLayersPanel(); } });
+        canvas.on('object:removed', () => { if (!canvas.isLoading) { saveState(); updateLayersPanel(); } });
+        saveState(); // état initial
+
+        // ==================== PANNEAU DES CALQUES ====================
+        function updateLayersPanel() {
+            const list = document.getElementById('layersList');
+            const objects = canvas.getObjects();
+            let html = '';
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                const name = obj.type === 'i-text' ? (obj.text || 'Texte') : (obj.type || 'Objet');
+                const isActive = canvas.getActiveObject() === obj;
+                const isVisible = obj.visible !== false;
+                html += `
+                <div class="layer-item ${isActive ? 'selected' : ''}" data-index="${i}" onclick="selectLayerByIndex(${i})">
+                    <i class="fa-solid fa-${obj.type === 'i-text' ? 'font' : obj.type === 'rect' ? 'square' : obj.type === 'ellipse' ? 'circle' : 'vector-square'}"></i>
+                    <span class="layer-name">${name}</span>
+                    <span class="layer-visibility ${!isVisible ? 'hidden' : ''}" onclick="event.stopPropagation(); toggleLayerVisibility(${i})">
+                        <i class="fa-solid fa-${isVisible ? 'eye' : 'eye-slash'}"></i>
+                    </span>
+                    <span class="layer-actions">
+                        <i class="fa-solid fa-trash" onclick="event.stopPropagation(); deleteLayer(${i})" title="Supprimer"></i>
+                    </span>
+                </div>`;
+            }
+            list.innerHTML = html || '<div style="color:#666; padding:10px; text-align:center;">Aucun calque</div>';
+        }
+
+        function selectLayerByIndex(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                canvas.setActiveObject(obj);
+                canvas.renderAll();
+                updateLayersPanel();
+            }
+        }
+
+        function toggleLayerVisibility(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                obj.visible = !obj.visible;
+                canvas.renderAll();
+                updateLayersPanel();
+            }
+        }
+
+        function deleteLayer(index) {
+            const obj = canvas.getObjects()[index];
+            if (obj) {
+                canvas.remove(obj);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+
+        function moveLayerUp() {
+            const active = canvas.getActiveObject();
+            if (!active) return;
+            const objects = canvas.getObjects();
+            const idx = objects.indexOf(active);
+            if (idx < objects.length - 1) {
+                canvas.moveTo(active, idx + 1);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+
+        function moveLayerDown() {
+            const active = canvas.getActiveObject();
+            if (!active) return;
+            const objects = canvas.getObjects();
+            const idx = objects.indexOf(active);
+            if (idx > 0) {
+                canvas.moveTo(active, idx - 1);
+                saveState();
+                updateLayersPanel();
+            }
+        }
+
+        function duplicateLayer() {
+            const active = canvas.getActiveObject();
+            if (!active) return;
+            active.clone((cloned) => {
+                cloned.set({ left: active.left + 20, top: active.top + 20 });
+                canvas.add(cloned);
+                canvas.setActiveObject(cloned);
+                saveState();
+                updateLayersPanel();
+            });
+        }
+
+        // ==================== MISE À JOUR DES PROPRIÉTÉS ====================
+        function updateProperty(prop, value) {
+            const active = canvas.getActiveObject();
+            if (!active) return;
+
+            switch (prop) {
+                case 'fill':
+                    active.set('fill', value);
+                    break;
+                case 'stroke':
+                    active.set('stroke', value);
+                    break;
+                case 'strokeWidth':
+                    const sw = parseInt(value);
+                    active.set('strokeWidth', sw);
+                    document.getElementById('strokeWidthNum').value = sw;
+                    break;
+                case 'opacity':
+                    const op = parseFloat(value);
+                    active.set('opacity', op);
+                    document.getElementById('opacityVal').textContent = Math.round(op * 100) + '%';
+                    break;
+            }
+            canvas.renderAll();
+            saveState();
+        }
+
+        // Synchronise les sliders avec l'objet sélectionné
+        canvas.on('selection:created', updatePropsPanel);
+        canvas.on('selection:updated', updatePropsPanel);
+        canvas.on('selection:cleared', () => {
+            // Réinitialiser les valeurs par défaut si rien n'est sélectionné
+            document.getElementById('fillColor').value = '#cc0000';
+            document.getElementById('strokeColor').value = '#000000';
+            document.getElementById('strokeWidth').value = 2;
+            document.getElementById('strokeWidthNum').value = 2;
+            document.getElementById('opacity').value = 1;
+            document.getElementById('opacityVal').textContent = '100%';
+        });
+
+        function updatePropsPanel() {
+            const obj = canvas.getActiveObject();
+            if (!obj) return;
+            document.getElementById('fillColor').value = obj.fill || '#000000';
+            document.getElementById('strokeColor').value = obj.stroke || '#000000';
+            const sw = obj.strokeWidth || 0;
+            document.getElementById('strokeWidth').value = sw;
+            document.getElementById('strokeWidthNum').value = sw;
+            const op = obj.opacity ?? 1;
+            document.getElementById('opacity').value = op;
+            document.getElementById('opacityVal').textContent = Math.round(op * 100) + '%';
+        }
+
+        // ==================== FONCTIONS DOCUMENT ====================
+        function newDocument() {
+            if (confirm('Créer un nouveau document ? Toutes les modifications seront perdues.')) {
+                canvas.clear();
+                canvas.backgroundColor = '#050000';
+                saveState();
+                updateLayersPanel();
+                fitCanvasToScreen();
+            }
+        }
+
+        function downloadImage(format) {
+            const dataURL = canvas.toDataURL({
+                format: format === 'jpeg' ? 'jpeg' : 'png',
+                quality: 1.0,
+                multiplier: 1, // taille réelle
+            });
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = `poster.${format}`;
+            link.click();
+        }
+
+        function resizeCanvas() {
+            const w = parseInt(document.getElementById('canvasWidth').value) || 2480;
+            const h = parseInt(document.getElementById('canvasHeight').value) || 3508;
+            canvas.setWidth(w);
+            canvas.setHeight(h);
+            fitCanvasToScreen();
+            saveState();
+            updateStatusBar();
+        }
+
+        function updateStatusBar() {
+            document.getElementById('canvasSizeInfo').textContent = `${canvas.width} × ${canvas.height} px`;
+            const zoom = Math.round(canvas.getZoom() * 100);
+            document.getElementById('zoomInfo').textContent = `${zoom}%`;
+        }
+
+        // Raccourcis clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+            if (e.key === 'v') currentTool = 'select'; // V pour sélection
+            if (e.key === 'r') currentTool = 'rectangle';
+            if (e.key === 'c') currentTool = 'circle';
+            if (e.key === 'l') currentTool = 'line';
+            if (e.key === 't') currentTool = 'text';
+        });
+
+        // Initialiser les calques
+        updateLayersPanel();
+        updateStatusBar();
+
+        // Empêcher la sélection par défaut du navigateur sur le canvas
+        document.getElementById('myCanvas').addEventListener('selectstart', (e) => e.preventDefault());
+    </script>
+</body>
+</html>
